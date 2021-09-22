@@ -12,9 +12,6 @@ import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 public class SpringBot {
-	//REMOVE THIS WHEN DONE TESTING!!!
-//	final static String TOKEN = "ODg1OTE0NzYyMDc1MDc4Njc3.YTt-ag.DkfdbYzQKu3mw_kYgDsIx3Bzv94";
-	//REMOVE THIS WHEN DONE TESTING!!!
 	
 	public static void main(String[] args) {
 		
