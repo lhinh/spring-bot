@@ -2,7 +2,7 @@ package com.github.lhinh.springbot;
 
 import com.github.lhinh.springbot.listeners.SlashCommandListener;
 import discord4j.core.DiscordClientBuilder;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.rest.RestClient;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -27,7 +27,7 @@ public class SpringBot {
                 SlashCommandListener slashCommandListener = new SlashCommandListener(springContext);
 
                 Mono<Void> onSlashCommandMono = gatewayClient
-                    .on(SlashCommandEvent.class, slashCommandListener::handle)
+                    .on(ChatInputInteractionEvent.class, slashCommandListener::handle)
                     .then();
 
                 return Mono.when(onSlashCommandMono);
