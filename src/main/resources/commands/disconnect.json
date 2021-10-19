@@ -1,0 +1,4 @@
+{
+    "name": "disconnect",
+    "description": "Disconnect the bot from the current voice channel."
+}
