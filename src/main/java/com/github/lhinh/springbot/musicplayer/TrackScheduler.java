@@ -1,5 +1,7 @@
 package com.github.lhinh.springbot.musicplayer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -10,18 +12,19 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 @Component
 public final class TrackScheduler implements AudioLoadResultHandler {
-
+	
+	final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
     private final AudioPlayer player;
     
-
     public TrackScheduler(final AudioPlayer player) {
         this.player = player;
     }
 
     @Override
     public void trackLoaded(final AudioTrack track) {
-        // LavaPlayer found an audio source for us to play
+    	//TODO add queue for music list
+		// LavaPlayer found an audio source for us to play
         player.playTrack(track);
     }
 
