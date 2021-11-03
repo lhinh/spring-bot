@@ -41,5 +41,7 @@ public final class TrackScheduler implements AudioLoadResultHandler {
     @Override
     public void loadFailed(final FriendlyException exception) {
         // LavaPlayer could not parse an audio source for some reason
+    	LOGGER.error("Link was not able to load:");
+    	LOGGER.error(exception.getMessage());
     }
 }
