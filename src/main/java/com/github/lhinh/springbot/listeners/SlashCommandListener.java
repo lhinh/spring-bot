@@ -2,25 +2,18 @@ package com.github.lhinh.springbot.listeners;
 
 import com.github.lhinh.springbot.commands.SlashCommand;
 
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import lombok.NonNull;
-
-import org.springframework.stereotype.Component;
-
+import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.Collection;
-import java.util.List;
 
-@Component
 public class SlashCommandListener {
-    private final Collection<SlashCommand> commands;
-    
-    public SlashCommandListener(@NonNull List<SlashCommand> slashCommands, GatewayDiscordClient client) {
-        commands = slashCommands;
-
-        client.on(ChatInputInteractionEvent.class, this::handle).subscribe();
+	private final Collection<SlashCommand> commands;
+	
+    public SlashCommandListener(ApplicationContext applicationContext) {
+        //Get all classes that implement our SlashCommand interface and annotated with @Component
+        commands = applicationContext.getBeansOfType(SlashCommand.class).values();
     }
 
 

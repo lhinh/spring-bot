@@ -8,23 +8,23 @@ import reactor.core.publisher.Mono;
 @Component
 public class DisconnectCommand implements SlashCommand {
 
-    @Override
-    public String getName() {
-        return "disconnect";
-    }
+	@Override
+	public String getName() {
+		return "disconnect";
+	}
 
-    @Override
-    public Mono<Void> handle(ChatInputInteractionEvent event) {
-        
+	@Override
+	public Mono<Void> handle(ChatInputInteractionEvent event) {
+		
 //		GatewayDiscordClient client = event.getClient();
 //		Snowflake guildId = event.getInteraction().getGuildId().get();
 //		Mono<Object> test = Mono.justOrEmpty(client.getVoiceConnectionRegistry().disconnect(guildId));
 //		Mono<Guild> voiceMono = Mono.justOrEmpty(event.getInteraction().getGuild())
 //				.flatMap(Guild::getVoiceConnection);
 
-        Mono<Object> voiceMono = Mono.justOrEmpty(event.getClient())
-                .flatMap(gatewayDiscordClient -> Mono.justOrEmpty(event.getInteraction().getGuildId())
-                        .flatMap(guildId -> gatewayDiscordClient.getVoiceConnectionRegistry().disconnect(guildId)));
+		Mono<Object> voiceMono = Mono.justOrEmpty(event.getClient())
+				.flatMap(gatewayDiscordClient -> Mono.justOrEmpty(event.getInteraction().getGuildId())
+						.flatMap(guildId -> gatewayDiscordClient.getVoiceConnectionRegistry().disconnect(guildId)));
 //		Mono<Object> voiceMono = Mono.justOrEmpty(event.getInteraction().getGuildId())
 //				.flatMap(guildId -> Mono.justOrEmpty(event.getInteraction().getClient())
 //						.flatMap(client -> {
@@ -38,10 +38,10 @@ public class DisconnectCommand implements SlashCommand {
 //				.flatMap(VoiceChannel::getVoiceConnection)
 //				.flatMap(connection -> connection.disconnect());
 
-        return event.reply("Disconnected!")
-                .withEphemeral(true)
+		return event.reply("Disconnected!")
+				.withEphemeral(true)
 //				.withContent("Disconnected!");
-                .and(voiceMono.then());
-    }
+				.and(voiceMono.then());
+	}
 
 }
