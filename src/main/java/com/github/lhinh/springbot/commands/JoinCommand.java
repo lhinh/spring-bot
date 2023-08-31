@@ -1,8 +1,6 @@
 package com.github.lhinh.springbot.commands;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import discord4j.core.object.entity.Member;
@@ -10,14 +8,17 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 public class JoinCommand implements SlashCommand {
 	
-	@Autowired
-	private AudioProvider provider;
+	private final AudioProvider provider;
 
+	JoinCommand(@NonNull AudioProvider provider) { this.provider = provider; }
+	
 	@Override
 	public String getName() {
 		return "join";
@@ -25,8 +26,6 @@ public class JoinCommand implements SlashCommand {
 
 	@Override
 	public Mono<Void> handle(ChatInputInteractionEvent event) {
-		
-		final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 		
 		Mono<VoiceConnection> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
 				.flatMap(Member::getVoiceState)
@@ -37,7 +36,8 @@ public class JoinCommand implements SlashCommand {
 //								.registerVoiceConnection(voiceConnection.getGuildId(), voiceConnection)));
 				// Deprecated method
 //				.flatMap(channel -> channel.join(Spec -> Spec.setProvider(provider)));
-		LOGGER.info("Joining voice channel.");
+
+		log.info("Joining voice channel.");
 
 		return event.reply("Joined voice channel!")
 				.withEphemeral(true)
