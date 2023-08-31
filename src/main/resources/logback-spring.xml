@@ -9,7 +9,7 @@
     <!-- You can learn more about this here: https://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%gray(%d{HH:mm:ss.SSS}) %green(%-5level) %magenta([%thread]) %cyan(%36logger{36}) - %msg%n</pattern>
+            <pattern>%gray(%d{HH:mm:ss.SSS}) %green(%-5level) %magenta([%15thread]) %cyan(%36logger{36}) - %msg%n</pattern>
         </encoder>
     </appender>
 
