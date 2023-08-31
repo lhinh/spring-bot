@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class SpringBot {
-	
-	public static void main(String[] args) {
-		
-		new SpringApplicationBuilder(SpringBot.class)
+    
+    public static void main(String[] args) {
+        
+        new SpringApplicationBuilder(SpringBot.class)
             .build()
             .run(args);
 
@@ -27,7 +27,7 @@ public class SpringBot {
 
         //         return Mono.when(onSlashCommandMono);
         //     }).block();
-	}
+    }
 
     @Bean
     public GatewayDiscordClient gatewayDiscordClient() {
@@ -36,8 +36,8 @@ public class SpringBot {
             .login()
             .block();
     }
-	
-	@Bean
+    
+    @Bean
     public RestClient discordRestClient(GatewayDiscordClient client) {
         return client.getRestClient();
     }

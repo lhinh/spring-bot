@@ -16,8 +16,8 @@ public class PingCommand implements SlashCommand {
     public Mono<Void> handle(ChatInputInteractionEvent event) {
         //We reply to the command with "Pong!" and make sure it is ephemeral (only the command user can see it)
         String guildId = event.getInteraction().getGuildId()
-        		.map(Snowflake::asString).get();
-    	return event.reply()
+                .map(Snowflake::asString).get();
+        return event.reply()
             .withEphemeral(true)
             .withContent("GuildId = " + guildId);
     }

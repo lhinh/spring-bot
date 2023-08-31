@@ -13,15 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public final class TrackScheduler implements AudioLoadResultHandler {
-	
+    
     private final AudioPlayer player;
     
     public TrackScheduler(final AudioPlayer player) { this.player = player; }
 
     @Override
     public void trackLoaded(final AudioTrack track) {
-    	//TODO add queue for music list
-		// LavaPlayer found an audio source for us to play
+        //TODO add queue for music list
+        // LavaPlayer found an audio source for us to play
         player.playTrack(track);
     }
 
@@ -38,7 +38,7 @@ public final class TrackScheduler implements AudioLoadResultHandler {
     @Override
     public void loadFailed(final FriendlyException exception) {
         // LavaPlayer could not parse an audio source for some reason
-    	log.error("Link was not able to load:");
-    	log.error(exception.getMessage());
+        log.error("Link was not able to load:");
+        log.error(exception.getMessage());
     }
 }

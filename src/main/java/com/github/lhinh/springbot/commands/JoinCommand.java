@@ -14,34 +14,34 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class JoinCommand implements SlashCommand {
-	
-	private final AudioProvider provider;
+    
+    private final AudioProvider provider;
 
-	JoinCommand(@NonNull AudioProvider provider) { this.provider = provider; }
-	
-	@Override
-	public String getName() {
-		return "join";
-	}
+    JoinCommand(@NonNull AudioProvider provider) { this.provider = provider; }
+    
+    @Override
+    public String getName() {
+        return "join";
+    }
 
-	@Override
-	public Mono<Void> handle(ChatInputInteractionEvent event) {
-		
-		Mono<VoiceConnection> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
-				.flatMap(Member::getVoiceState)
-				.flatMap(VoiceState::getChannel)
-				.flatMap(channel -> channel.join().withProvider(provider));
+    @Override
+    public Mono<Void> handle(ChatInputInteractionEvent event) {
+        
+        Mono<VoiceConnection> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
+                .flatMap(Member::getVoiceState)
+                .flatMap(VoiceState::getChannel)
+                .flatMap(channel -> channel.join().withProvider(provider));
 //				.doOnNext(voiceConnection -> Mono.justOrEmpty(event.getInteraction().getClient())
 //						.flatMap(client -> client.getVoiceConnectionRegistry()
 //								.registerVoiceConnection(voiceConnection.getGuildId(), voiceConnection)));
-				// Deprecated method
+                // Deprecated method
 //				.flatMap(channel -> channel.join(Spec -> Spec.setProvider(provider)));
 
-		log.info("Joining voice channel.");
+        log.info("Joining voice channel.");
 
-		return event.reply("Joined voice channel!")
-				.withEphemeral(true)
-				.and(voiceMono);
-	}
+        return event.reply("Joined voice channel!")
+                .withEphemeral(true)
+                .and(voiceMono);
+    }
 
 }

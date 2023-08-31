@@ -15,8 +15,8 @@ import java.util.List;
 
 @Component
 public class SlashCommandListener {
-	private final Collection<SlashCommand> commands;
-	
+    private final Collection<SlashCommand> commands;
+    
     public SlashCommandListener(@NonNull List<SlashCommand> slashCommands, GatewayDiscordClient client) {
         commands = slashCommands;
 
