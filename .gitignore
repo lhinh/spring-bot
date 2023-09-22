@@ -31,7 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
-
+META-INF/
 
 # Created by https://www.toptal.com/developers/gitignore/api/maven,eclipse,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=maven,eclipse,java
