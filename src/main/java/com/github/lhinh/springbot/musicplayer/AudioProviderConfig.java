@@ -17,7 +17,7 @@ public class AudioProviderConfig {
     @Bean
     public AudioPlayerManager playerManager() {
         // Creates AudioPlayer instances and translates URLs to AudioTrack instances
-        final AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+        AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         // This is an optimization strategy that Discord4J can utilize. It is not important to understand
         playerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         // Allow playerManager to parse remote sources like YouTube links
@@ -27,7 +27,7 @@ public class AudioProviderConfig {
     
     @Bean
     public AudioPlayer player() {
-        final AudioPlayer player = playerManager().createPlayer();
+        AudioPlayer player = playerManager().createPlayer();
         return player;
     }
     
@@ -39,7 +39,7 @@ public class AudioProviderConfig {
     
     @Bean
     public TrackScheduler scheduler() {
-        final TrackScheduler scheduler = new TrackScheduler(player());
+        TrackScheduler scheduler = new TrackScheduler(player());
         return scheduler;
     }
     

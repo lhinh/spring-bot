@@ -3,6 +3,10 @@ package com.github.lhinh.springbot.commands;
 
 import org.springframework.stereotype.Component;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.channel.VoiceChannel;
+import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -22,9 +26,16 @@ public class DisconnectCommand implements SlashCommand {
 //		Mono<Guild> voiceMono = Mono.justOrEmpty(event.getInteraction().getGuild())
 //				.flatMap(Guild::getVoiceConnection);
 
-        Mono<Object> voiceMono = Mono.justOrEmpty(event.getClient())
-                .flatMap(gatewayDiscordClient -> Mono.justOrEmpty(event.getInteraction().getGuildId())
-                        .flatMap(guildId -> gatewayDiscordClient.getVoiceConnectionRegistry().disconnect(guildId)));
+        // Mono<Object> voiceMono = Mono.justOrEmpty(event.getClient())
+        //         .flatMap(gatewayDiscordClient -> Mono.justOrEmpty(event.getInteraction().getGuildId())
+        //                 .flatMap(guildId -> gatewayDiscordClient.getVoiceConnectionRegistry().disconnect(guildId)));
+
+        Mono<Void> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
+            .flatMap(Member::getVoiceState)
+            .flatMap(VoiceState::getChannel)
+            .flatMap(VoiceChannel::getVoiceConnection)
+            .flatMap(VoiceConnection::disconnect)
+            .then();
 //		Mono<Object> voiceMono = Mono.justOrEmpty(event.getInteraction().getGuildId())
 //				.flatMap(guildId -> Mono.justOrEmpty(event.getInteraction().getClient())
 //						.flatMap(client -> {
@@ -41,7 +52,7 @@ public class DisconnectCommand implements SlashCommand {
         return event.reply("Disconnected!")
                 .withEphemeral(true)
 //				.withContent("Disconnected!");
-                .and(voiceMono.then());
+                .and(voiceMono);
     }
 
 }
