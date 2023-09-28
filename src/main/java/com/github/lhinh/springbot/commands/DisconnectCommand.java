@@ -13,46 +13,20 @@ import reactor.core.publisher.Mono;
 public class DisconnectCommand implements SlashCommand {
 
     @Override
-    public String getName() {
-        return "disconnect";
-    }
+    public String getName() { return "disconnect"; }
 
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
-        
-//		GatewayDiscordClient client = event.getClient();
-//		Snowflake guildId = event.getInteraction().getGuildId().get();
-//		Mono<Object> test = Mono.justOrEmpty(client.getVoiceConnectionRegistry().disconnect(guildId));
-//		Mono<Guild> voiceMono = Mono.justOrEmpty(event.getInteraction().getGuild())
-//				.flatMap(Guild::getVoiceConnection);
 
-        // Mono<Object> voiceMono = Mono.justOrEmpty(event.getClient())
-        //         .flatMap(gatewayDiscordClient -> Mono.justOrEmpty(event.getInteraction().getGuildId())
-        //                 .flatMap(guildId -> gatewayDiscordClient.getVoiceConnectionRegistry().disconnect(guildId)));
-
-        Mono<Void> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
+        Mono.justOrEmpty(event.getInteraction().getMember())
             .flatMap(Member::getVoiceState)
             .flatMap(VoiceState::getChannel)
             .flatMap(VoiceChannel::getVoiceConnection)
             .flatMap(VoiceConnection::disconnect)
-            .then();
-//		Mono<Object> voiceMono = Mono.justOrEmpty(event.getInteraction().getGuildId())
-//				.flatMap(guildId -> Mono.justOrEmpty(event.getInteraction().getClient())
-//						.flatMap(client -> {
-//							LOGGER.info("Guild ID =" + guildId.asString());
-//							return client.getVoiceConnectionRegistry().disconnect(guildId);
-//						}));
-//		LOGGER.info("Disconnecting.");
-//		Mono<Void> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
-//				.flatMap(Member::getVoiceState)
-//				.flatMap(voiceState -> clientMono.getVoiceConnection())
-//				.flatMap(VoiceChannel::getVoiceConnection)
-//				.flatMap(connection -> connection.disconnect());
+            .subscribe();
 
         return event.reply("Disconnected!")
-                .withEphemeral(true)
-//				.withContent("Disconnected!");
-                .and(voiceMono);
+                .withEphemeral(true);
     }
 
 }
