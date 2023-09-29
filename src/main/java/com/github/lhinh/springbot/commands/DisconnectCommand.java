@@ -25,7 +25,7 @@ public class DisconnectCommand implements SlashCommand {
             .flatMap(VoiceConnection::disconnect)
             .subscribe();
 
-        return event.reply("Disconnected!")
+        return event.reply("Disconnect.")
                 .withEphemeral(true);
     }
 

@@ -29,7 +29,7 @@ public class JoinCommand implements SlashCommand {
             .flatMap(channel -> channel.join().withProvider(guildAudioManager.of(channel.getGuildId()).getProvider()))
             .subscribe();
 
-        return event.reply("Joined voice channel!")
+        return event.reply("Joining voice channel.")
                 .withEphemeral(true);
     }
 

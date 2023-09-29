@@ -8,12 +8,15 @@ import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
 
+import java.util.List;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.github.lhinh.springbot.musicplayer.AudioTrackLoadResultHandler;
+import com.github.lhinh.springbot.musicplayer.AudioTrackScheduler;
 import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import reactor.core.publisher.Mono;
 
@@ -64,11 +67,17 @@ public class PlayCommand implements SlashCommand {
             .orElseThrow();
 
         GuildAudioManager currentGuildAudioManager = guildAudioManager.of(guildId);
-        
+        AudioTrackScheduler scheduler = currentGuildAudioManager.getScheduler();
+
         currentGuildAudioManager.getAudioPlayerManager()
-            .loadItem(link, new AudioTrackLoadResultHandler(currentGuildAudioManager.getScheduler()));
+            .loadItem(link, new AudioTrackLoadResultHandler(scheduler));
         
-        return event.reply("Now Playing: " + link).withEphemeral(true);
+        List<AudioTrack> playlist = scheduler.getQueue();
+        if (playlist.isEmpty() && !scheduler.isPlaying())
+            return event.reply("Now Playing: " + link);
+        
+        int trackPosition = playlist.size() + 1;
+        return event.reply("[" + trackPosition + "] Position in playlist\n" + link);
     }
 
 }
