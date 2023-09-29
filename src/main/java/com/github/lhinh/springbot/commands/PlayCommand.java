@@ -1,64 +1,83 @@
 package com.github.lhinh.springbot.commands;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.object.VoiceState;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
-import lombok.extern.slf4j.Slf4j;
+import discord4j.core.object.entity.Member;
+import discord4j.voice.VoiceConnection;
 
+import java.util.List;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import com.github.lhinh.springbot.musicplayer.TrackScheduler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.github.lhinh.springbot.musicplayer.AudioTrackLoadResultHandler;
+import com.github.lhinh.springbot.musicplayer.AudioTrackScheduler;
+import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @Component
 public class PlayCommand implements SlashCommand {
 
-    private final AudioPlayerManager playerManager;
-    
-    private final AudioPlayer player;
-    
-    private TrackScheduler scheduler;
+    private final GuildAudioManager guildAudioManager;
 
-    PlayCommand(AudioPlayerManager playerManager, AudioPlayer player) {
-        this.playerManager = playerManager;
-        this.player = player;
-    }
+    public PlayCommand(@NonNull GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
     
     @Override
-    public String getName() {
-        return "play";
+    public String getName() { return "play"; }
+
+    private Mono<VoiceConnection> joinMemberChannel(ChatInputInteractionEvent event) {
+        return Mono.justOrEmpty(event.getInteraction().getMember())
+            .flatMap(Member::getVoiceState)
+            .flatMap(VoiceState::getChannel)
+            .flatMap(channel -> {
+                return channel.join().withProvider(guildAudioManager.of(channel.getGuildId()).getProvider());
+            });
     }
 
     @Override
-    public Mono<Void> handle(ChatInputInteractionEvent event) {		
-//		Mono<VoiceConnection> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
-//				.flatMap(Member::getVoiceState)
-//				.flatMap(VoiceState::getChannel)
-//				.flatMap(channel -> channel.join().withProvider(provider));
-//		
-//		LOGGER.info("Joining voice channel.");
+    public Mono<Void> handle(ChatInputInteractionEvent event) {
+        Snowflake guildId = event.getInteraction().getGuildId().orElseThrow();
+
+        Mono<Snowflake> memberVoiceChannelId =  Mono.justOrEmpty(event.getInteraction().getMember())
+            .flatMap(Member::getVoiceState)
+            .flatMap(voiceState -> Mono.justOrEmpty(voiceState.getChannelId()));
+
+        Mono<Snowflake> currentVoiceChannelId = Mono.justOrEmpty(event.getClient().getVoiceConnectionRegistry())
+            .flatMap(voiceConnectionRegistry -> voiceConnectionRegistry.getVoiceConnection(guildId))
+            .flatMap(VoiceConnection::getChannelId);
         
-        scheduler = new TrackScheduler(player);
-        
+        memberVoiceChannelId.zipWith(currentVoiceChannelId)
+            .flatMap(tuple -> {
+                if (tuple.getT1().equals(tuple.getT2()))
+                    return Mono.just("Same channel, don't join again.");
+
+                return joinMemberChannel(event);
+            })
+            .switchIfEmpty(Mono.defer(() -> joinMemberChannel(event)))
+            .block();
+
         String link = event.getOption("link")
-                .flatMap(ApplicationCommandInteractionOption::getValue)
-                .map(ApplicationCommandInteractionOptionValue::asString)
-                .get();
+            .flatMap(ApplicationCommandInteractionOption::getValue)
+            .map(ApplicationCommandInteractionOptionValue::asString)
+            .orElseThrow();
+
+        GuildAudioManager currentGuildAudioManager = guildAudioManager.of(guildId);
+        AudioTrackScheduler scheduler = currentGuildAudioManager.getScheduler();
+
+        currentGuildAudioManager.getAudioPlayerManager()
+            .loadItem(link, new AudioTrackLoadResultHandler(scheduler));
         
-        // long guildId = event.getInteraction().getGuildId()
-        // 		.map(Snowflake::asLong)
-        // 		.get();
+        List<AudioTrack> playlist = scheduler.getQueue();
+        if (playlist.isEmpty() && !scheduler.isPlaying())
+            return event.reply("Now Playing: " + link);
         
-        playerManager.loadItem(link, scheduler);
-        
-        log.info("Playing link: " + link);
-        
-        return event.reply("Now Playing: " + link);
-//				.and(voiceMono);
+        int trackPosition = playlist.size() + 1;
+        return event.reply("[" + trackPosition + "] Position in playlist\n" + link);
     }
 
 }

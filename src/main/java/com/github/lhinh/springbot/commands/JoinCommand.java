@@ -3,45 +3,34 @@ package com.github.lhinh.springbot.commands;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
+
 import discord4j.core.object.entity.Member;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.VoiceState;
-import discord4j.voice.AudioProvider;
-import discord4j.voice.VoiceConnection;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @Component
 public class JoinCommand implements SlashCommand {
     
-    private final AudioProvider provider;
+    private final GuildAudioManager guildAudioManager;
 
-    JoinCommand(@NonNull AudioProvider provider) { this.provider = provider; }
+    JoinCommand(@NonNull final GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
     
     @Override
-    public String getName() {
-        return "join";
-    }
+    public String getName() { return "join"; }
 
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
         
-        Mono<VoiceConnection> voiceMono = Mono.justOrEmpty(event.getInteraction().getMember())
-                .flatMap(Member::getVoiceState)
-                .flatMap(VoiceState::getChannel)
-                .flatMap(channel -> channel.join().withProvider(provider));
-//				.doOnNext(voiceConnection -> Mono.justOrEmpty(event.getInteraction().getClient())
-//						.flatMap(client -> client.getVoiceConnectionRegistry()
-//								.registerVoiceConnection(voiceConnection.getGuildId(), voiceConnection)));
-                // Deprecated method
-//				.flatMap(channel -> channel.join(Spec -> Spec.setProvider(provider)));
+        Mono.justOrEmpty(event.getInteraction().getMember())
+            .flatMap(Member::getVoiceState)
+            .flatMap(VoiceState::getChannel)
+            .flatMap(channel -> channel.join().withProvider(guildAudioManager.of(channel.getGuildId()).getProvider()))
+            .subscribe();
 
-        log.info("Joining voice channel.");
-
-        return event.reply("Joined voice channel!")
-                .withEphemeral(true)
-                .and(voiceMono);
+        return event.reply("Joining voice channel.")
+                .withEphemeral(true);
     }
 
 }
