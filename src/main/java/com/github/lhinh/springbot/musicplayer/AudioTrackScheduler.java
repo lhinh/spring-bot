@@ -13,12 +13,14 @@ public class AudioTrackScheduler extends AudioEventAdapter {
 
   private final List<AudioTrack> queue;
   private final AudioPlayer player;
+  private boolean isPlaying;
 
   public AudioTrackScheduler(AudioPlayer player) {
     // The queue may be modifed by different threads so guarantee memory safety
     // This does not, however, remove several race conditions currently present
     queue = Collections.synchronizedList(new LinkedList<>());
     this.player = player;
+    isPlaying = false;
   }
 
   public List<AudioTrack> getQueue() {
@@ -26,20 +28,30 @@ public class AudioTrackScheduler extends AudioEventAdapter {
   }
 
   public boolean play(AudioTrack track) {
-    return play(track, false);
+    isPlaying = play(track, false);
+    return isPlaying;
   }
 
   public boolean play(AudioTrack track, boolean force) {
-    boolean playing = player.startTrack(track, !force);
+    isPlaying = player.startTrack(track, !force);
 
-    if (!playing) {
+    if (!isPlaying) 
       queue.add(track);
-    }
-    return playing;
+    
+    return isPlaying;
   }
 
   public boolean skip() {
     return !queue.isEmpty() && play(queue.remove(0), true);
+  }
+
+  public void stop() {
+    queue.clear();
+    player.stopTrack();
+  }
+
+  public boolean isPlaying() {
+    return isPlaying;
   }
 
   @Override
