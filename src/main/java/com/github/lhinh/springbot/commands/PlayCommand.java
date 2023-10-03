@@ -25,7 +25,7 @@ public class PlayCommand implements SlashCommand {
 
     private final GuildAudioManager guildAudioManager;
 
-    public PlayCommand(@NonNull GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
+    public PlayCommand(@NonNull final GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
     
     @Override
     public String getName() { return "play"; }
@@ -66,18 +66,15 @@ public class PlayCommand implements SlashCommand {
             .map(ApplicationCommandInteractionOptionValue::asString)
             .orElseThrow();
 
-        GuildAudioManager currentGuildAudioManager = guildAudioManager.of(guildId);
-        AudioTrackScheduler scheduler = currentGuildAudioManager.getScheduler();
+        GuildAudioManager currentGAM = guildAudioManager.of(guildId);
 
-        currentGuildAudioManager.getAudioPlayerManager()
-            .loadItem(link, new AudioTrackLoadResultHandler(scheduler));
+        currentGAM.loadItem(link);
         
-        List<AudioTrack> playlist = scheduler.getQueue();
-        if (playlist.isEmpty() && !scheduler.isPlaying())
+        if (currentGAM.isPlaylistEmpty())
             return event.reply("Now Playing: " + link);
-        
-        int trackPosition = playlist.size() + 1;
-        return event.reply("[" + trackPosition + "] Position in playlist\n" + link);
+
+        int trackPosition = currentGAM.getPlaylistSize();
+        return event.reply("#" + trackPosition + " in playlist\n" + link);
     }
 
 }

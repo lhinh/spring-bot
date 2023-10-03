@@ -15,7 +15,9 @@ public class StopCommand implements SlashCommand {
 
     private final GuildAudioManager guildAudioManager;
 
-    public StopCommand(@NonNull final GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
+    public StopCommand(@NonNull final GuildAudioManager guildAudioManager) {
+        this.guildAudioManager = guildAudioManager;
+    }
 
     @Override
     public String getName() { return "stop"; }
@@ -23,11 +25,11 @@ public class StopCommand implements SlashCommand {
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
         Snowflake guildId = event.getInteraction().getGuildId().orElseThrow();
-        GuildAudioManager currentGuildAudioManager = guildAudioManager.of(guildId);
-        AudioTrackScheduler scheduler = currentGuildAudioManager.getScheduler();
-        if (scheduler.isPlaying()) {
+        GuildAudioManager currentGAM = guildAudioManager.of(guildId);
+        AudioTrackScheduler scheduler = currentGAM.getScheduler();
+        if (currentGAM.isCurrentlyPlaying()) {
             scheduler.stop();
-            return event.reply("Stop playback & clear playlist.");
+            return event.reply("Stop playback & clearing playlist");
         }
         return event.reply("Nothing is playing.");
     }
