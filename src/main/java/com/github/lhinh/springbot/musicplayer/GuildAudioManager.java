@@ -1,17 +1,21 @@
 package com.github.lhinh.springbot.musicplayer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Component;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import discord4j.common.util.Snowflake;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @Component
 public class GuildAudioManager{
@@ -33,5 +37,44 @@ public class GuildAudioManager{
         provider = new LavaPlayerAudioProvider(player);
 
         player.addListener(scheduler);
+    }
+
+    /**
+     * Extracts playable audio track from {@code link} and loads into audio player.
+     * This is a blocking operation.
+     * @param link the url containing playable audio
+     */
+    public void loadItem(String link) {
+        try {
+            audioPlayerManager.loadItem(link, new AudioTrackLoadResultHandler(scheduler)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    public List<AudioTrack> getPlaylist() {
+        return scheduler.getQueue();
+    }
+
+    public int getPlaylistSize() {
+        List<AudioTrack> playlist = getPlaylist();
+        synchronized (playlist) {
+            return playlist.size();
+        }
+    }
+
+    public boolean isPlaylistEmpty() {
+        List<AudioTrack> playlist = getPlaylist();
+        synchronized (playlist) {
+            return playlist.isEmpty();
+        }
+    }
+
+    public boolean isCurrentlyPlaying() {
+        return scheduler.isCurrentlyPlaying();
+    }
+
+    public String getPlayingTrackAsString() {
+        return player.getPlayingTrack().getInfo().uri;
     }
 }
