@@ -13,14 +13,14 @@ public class AudioTrackScheduler extends AudioEventAdapter {
 
   private final List<AudioTrack> queue;
   private final AudioPlayer player;
-  private boolean isPlaying;
+  private boolean isCurrentlyPlaying;
 
   public AudioTrackScheduler(AudioPlayer player) {
     // The queue may be modifed by different threads so guarantee memory safety
     // This does not, however, remove several race conditions currently present
     queue = Collections.synchronizedList(new LinkedList<>());
     this.player = player;
-    isPlaying = false;
+    isCurrentlyPlaying = false;
   }
 
   public List<AudioTrack> getQueue() {
@@ -28,30 +28,45 @@ public class AudioTrackScheduler extends AudioEventAdapter {
   }
 
   public boolean play(AudioTrack track) {
-    isPlaying = play(track, false);
-    return isPlaying;
+    return play(track, false);
   }
 
   public boolean play(AudioTrack track, boolean force) {
-    isPlaying = player.startTrack(track, !force);
+    boolean isPlayingThisTrack = player.startTrack(track, !force);
 
-    if (!isPlaying) 
-      queue.add(track);
+    if (!isPlayingThisTrack) {
+      synchronized (queue) {
+        queue.add(track);
+      }
+    } else {
+      isCurrentlyPlaying = true;
+    }
     
-    return isPlaying;
+    return isPlayingThisTrack;
   }
 
   public boolean skip() {
-    return !queue.isEmpty() && play(queue.remove(0), true);
+    if (!queue.isEmpty()) {
+      synchronized (queue) {
+        AudioTrack nextTrack = queue.remove(0);
+        return play(nextTrack, true);
+      }
+    } else {
+      stop();
+      return isCurrentlyPlaying;
+    }
   }
 
   public void stop() {
-    queue.clear();
-    player.stopTrack();
+    synchronized (queue) {
+      queue.clear();
+      player.stopTrack();
+      isCurrentlyPlaying = false;
+    }
   }
 
-  public boolean isPlaying() {
-    return isPlaying;
+  public boolean isCurrentlyPlaying() {
+    return isCurrentlyPlaying;
   }
 
   @Override
