@@ -1,14 +1,10 @@
 package com.github.lhinh.springbot.commands;
 
-import java.util.List;
-
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.github.lhinh.springbot.musicplayer.AudioTrackScheduler;
 import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
