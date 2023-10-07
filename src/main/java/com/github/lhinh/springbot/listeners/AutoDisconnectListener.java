@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
-import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
@@ -50,5 +49,4 @@ public class AutoDisconnectListener implements EventListener<VoiceStateUpdateEve
 
         return onEvent.then(disconnect);
     }
-    
 }
