@@ -77,4 +77,8 @@ public class GuildAudioManager{
     public String getPlayingTrackAsString() {
         return player.getPlayingTrack().getInfo().uri;
     }
+
+    public void cleanUp() {
+        scheduler.stop();
+    }
 }

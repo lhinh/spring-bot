@@ -3,6 +3,8 @@ package com.github.lhinh.springbot.listeners;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Component;
 
+import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
+
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.entity.channel.VoiceChannel;
@@ -12,6 +14,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class AutoDisconnectListener implements EventListener<VoiceStateUpdateEvent> {
 
+    private final GuildAudioManager guildAudioManager;
+
+    public AutoDisconnectListener(final GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
+
     @Override
     public Class<VoiceStateUpdateEvent> getEventType() {
         return VoiceStateUpdateEvent.class;
@@ -20,6 +26,7 @@ public class AutoDisconnectListener implements EventListener<VoiceStateUpdateEve
     @Override
     public Mono<Void> handle(VoiceStateUpdateEvent event) {
         Snowflake currentGuildId = event.getCurrent().getGuildId();
+        GuildAudioManager currentGAM = guildAudioManager.of(currentGuildId);
 
         Snowflake voiceChannelId;
         if (event.isJoinEvent()) {
@@ -45,7 +52,10 @@ public class AutoDisconnectListener implements EventListener<VoiceStateUpdateEve
             .then();
 
         Mono<Void> disconnect = event.getClient().getVoiceConnectionRegistry().getVoiceConnection(currentGuildId)
-            .flatMap(VoiceConnection::disconnect);
+            .flatMap(voiceChannel -> {
+                currentGAM.cleanUp();
+                return voiceChannel.disconnect();
+            });
 
         return onEvent.then(disconnect);
     }
