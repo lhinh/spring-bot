@@ -8,16 +8,10 @@ import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
 
-import java.util.List;
-
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import com.github.lhinh.springbot.musicplayer.AudioTrackLoadResultHandler;
-import com.github.lhinh.springbot.musicplayer.AudioTrackScheduler;
 import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import reactor.core.publisher.Mono;
 
 @Component
