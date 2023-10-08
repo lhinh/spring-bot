@@ -45,7 +45,7 @@ public class PlayCommand implements SlashCommand {
             .flatMap(voiceConnectionRegistry -> voiceConnectionRegistry.getVoiceConnection(guildId))
             .flatMap(VoiceConnection::getChannelId);
         
-        memberVoiceChannelId.zipWith(currentVoiceChannelId)
+        Mono<Void> joinEvent = memberVoiceChannelId.zipWith(currentVoiceChannelId)
             .flatMap(tuple -> {
                 if (tuple.getT1().equals(tuple.getT2()))
                     return Mono.just("Same channel, don't join again.");
@@ -53,7 +53,7 @@ public class PlayCommand implements SlashCommand {
                 return joinMemberChannel(event);
             })
             .switchIfEmpty(Mono.defer(() -> joinMemberChannel(event)))
-            .block();
+            .then();
 
         String link = event.getOption("link")
             .flatMap(ApplicationCommandInteractionOption::getValue)
@@ -62,13 +62,22 @@ public class PlayCommand implements SlashCommand {
 
         GuildAudioManager currentGAM = guildAudioManager.of(guildId);
 
-        currentGAM.loadItem(link);
+        Mono<Void> extractAndLoadAudio = Mono.justOrEmpty(currentGAM.loadItem(link));
         
-        if (currentGAM.isPlaylistEmpty())
-            return event.reply("Now Playing: " + link);
+        Mono<Void> editReplyOnPlaylistCount = Mono.justOrEmpty(currentGAM.isPlaylistEmpty())
+            .flatMap(isPlaylistEmpty -> {
+                if (currentGAM.isPlaylistEmpty()) {
+                    return event.editReply("Now Playing: " + link);
+                } else {
+                    int trackPosition = currentGAM.getPlaylistSize();
+                    return event.editReply("#" + trackPosition + " in playlist\n" + link);
+                }
+            }).then();
 
-        int trackPosition = currentGAM.getPlaylistSize();
-        return event.reply("#" + trackPosition + " in playlist\n" + link);
+        return event.deferReply()
+            .then(joinEvent)
+            .then(extractAndLoadAudio)
+            .then(editReplyOnPlaylistCount);
     }
 
 }

@@ -44,12 +44,13 @@ public class GuildAudioManager{
      * This is a blocking operation.
      * @param link the url containing playable audio
      */
-    public void loadItem(String link) {
+    public Void loadItem(String link) {
         try {
             audioPlayerManager.loadItem(link, new AudioTrackLoadResultHandler(scheduler)).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error(e.getMessage());
         }
+        return (Void)null;
     }
 
     public List<AudioTrack> getPlaylist() {
