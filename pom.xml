@@ -5,7 +5,7 @@
     
     <groupId>lhinh</groupId>
     <artifactId>spring-bot</artifactId>
-    <version>1.0</version>
+    <version>v0.1.0</version>
     <name>spring-bot</name>
 
     <properties>
@@ -15,8 +15,8 @@
         <d4j.version>3.2.5</d4j.version>
         <lavaplayer.version>1.4.3</lavaplayer.version>
         <mariadb.version>3.2.0</mariadb.version>
-        <java.version>20</java.version>
-        <maven.compiler.release>20</maven.compiler.release>
+        <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <repositories>
@@ -59,16 +59,19 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
         </dependency> -->
-        <!-- <dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
-        </dependency> -->
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Annotations Processor stuffs -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <!-- Discord4J -->
         <dependency>
             <groupId>com.discord4j</groupId>
@@ -76,20 +79,13 @@
             <version>${d4j.version}</version>
         </dependency>
         <!-- Music Player -->
-        <!-- <dependency>
-            <groupId>com.sedmelluq</groupId>
-            <artifactId>lavaplayer</artifactId>
-            <version>${lavaplayer.version}</version>
-        </dependency> -->
-
-
         <dependency>
             <groupId>com.github.walkyst</groupId>
             <artifactId>lavaplayer-fork</artifactId>
             <version>${lavaplayer.version}</version>
         </dependency>
 
-
+        <!-- Database -->
         <!-- <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
@@ -108,6 +104,12 @@
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>4.0.0</version>
         </dependency> -->
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <version>3.5.10</version>
+        </dependency>
 
     </dependencies>
 
@@ -131,10 +133,10 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <!-- <exclude>
+                    <exclude>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok</artifactId>
-                    </exclude> -->
+                    </exclude>
                     <!-- <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
