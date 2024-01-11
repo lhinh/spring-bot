@@ -12,14 +12,20 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
+import com.github.lhinh.springbot.util.HttpLinkUtil;
+
 import reactor.core.publisher.Mono;
 
 @Component
 public class PlayCommand implements SlashCommand {
 
     private final GuildAudioManager guildAudioManager;
+    private final HttpLinkUtil httpLinkUtil;
 
-    public PlayCommand(@NonNull final GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
+    public PlayCommand(@NonNull final GuildAudioManager guildAudioManager) {
+        this.guildAudioManager = guildAudioManager;
+        this.httpLinkUtil = new HttpLinkUtil();
+    }
     
     @Override
     public String getName() { return "play"; }
@@ -55,10 +61,12 @@ public class PlayCommand implements SlashCommand {
             .switchIfEmpty(Mono.defer(() -> joinMemberChannel(event)))
             .then();
 
-        String link = event.getOption("link")
+        String inputOption = event.getOption("link")
             .flatMap(ApplicationCommandInteractionOption::getValue)
             .map(ApplicationCommandInteractionOptionValue::asString)
             .orElseThrow();
+
+        String link = getLinkOrSearchQuery(inputOption, "ytsearch:");
 
         GuildAudioManager currentGAM = guildAudioManager.of(guildId);
 
@@ -74,10 +82,32 @@ public class PlayCommand implements SlashCommand {
                 }
             }).then();
 
-        return event.deferReply()
-            .then(joinEvent)
-            .then(extractAndLoadAudio)
-            .then(editReplyOnPlaylistCount);
+        Mono<Void> editReplyOnSearchQuery = Mono.justOrEmpty("nothing")
+            .flatMap(ignore -> {
+                currentGAM.clearPlaylist();
+                return event.editReply("Now Playing: " + currentGAM.getPlayingTrack().getInfo().uri);
+            }).then();
+        
+        if (httpLinkUtil.isValidHttpLink(link)) {
+            return event.deferReply()
+                .then(joinEvent)
+                .then(extractAndLoadAudio)
+                .then(editReplyOnPlaylistCount);
+        } else {
+            return event.deferReply()
+                .then(joinEvent)
+                .then(extractAndLoadAudio)
+                .then(editReplyOnSearchQuery);
+        }
+    }
+
+    private String getLinkOrSearchQuery(String inputOption, String searchTag) {
+        if (httpLinkUtil.isValidHttpLink(inputOption)) {
+            return inputOption;
+        } else {
+            String searchQuery = searchTag + inputOption;
+            return searchQuery;
+        }
     }
 
 }

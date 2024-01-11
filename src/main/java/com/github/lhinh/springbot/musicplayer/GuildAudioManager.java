@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Component;
 
-import com.github.lhinh.springbot.util.HttpLinkUtil;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -26,7 +25,7 @@ public class GuildAudioManager{
     private final LavaPlayerAudioProvider provider;
     private final AudioPlayerManager audioPlayerManager;
     private final Map<Snowflake, GuildAudioManager> guildAudioManagers = new ConcurrentHashMap<>();
-    private final HttpLinkUtil httpLinkUtil;
+    
 
     public GuildAudioManager of(Snowflake guildId) {
         return guildAudioManagers.computeIfAbsent(guildId, ignored -> new GuildAudioManager(audioPlayerManager));
@@ -37,7 +36,6 @@ public class GuildAudioManager{
         player = audioPlayerManager.createPlayer();
         scheduler = new AudioTrackScheduler(player);
         provider = new LavaPlayerAudioProvider(player);
-        httpLinkUtil = new HttpLinkUtil();
 
         player.addListener(scheduler);
     }
@@ -49,21 +47,19 @@ public class GuildAudioManager{
      */
     public Void loadItem(String link) {
         try {
-            String linkOrSearchQuery = getLinkOrSearchQuery(link, "ytsearch:");
-            audioPlayerManager.loadItem(linkOrSearchQuery, new AudioTrackLoadResultHandler(scheduler)).get();
+            audioPlayerManager.loadItem(link, new AudioTrackLoadResultHandler(scheduler)).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error(e.getMessage());
         }
         return (Void)null;
     }
 
-    private String getLinkOrSearchQuery(String link, String searchTag) {
-        if (httpLinkUtil.isValidHttpLink(link)) {
-            return link;
-        } else {
-            String searchQuery = searchTag + link;
-            return searchQuery;
-        }
+    public AudioTrack getPlayingTrack() {
+        return player.getPlayingTrack();
+    }
+
+    public void clearPlaylist() {
+        getPlaylist().clear();
     }
 
     public List<AudioTrack> getPlaylist() {
