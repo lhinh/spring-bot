@@ -2,8 +2,8 @@ package com.github.lhinh.springbot.musicplayer;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
@@ -54,10 +54,6 @@ public class GuildAudioManager{
         return (Void)null;
     }
 
-    public AudioTrack getPlayingTrack() {
-        return player.getPlayingTrack();
-    }
-
     public void clearPlaylist() {
         getPlaylist().clear();
     }
@@ -84,8 +80,12 @@ public class GuildAudioManager{
         return scheduler.isCurrentlyPlaying();
     }
 
-    public String getPlayingTrackAsString() {
-        return player.getPlayingTrack().getInfo().uri;
+    public AudioTrack getPlayingTrack() {
+        return player.getPlayingTrack();
+    }
+
+    public String getPlayingTrackUri() {
+        return getPlayingTrack().getInfo().uri;
     }
 
     public void cleanUp() {
