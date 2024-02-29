@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  spring-bot:
+    build: .
+    volumes:
+      - ${LOG_DIR}:/app/logs
+    environment:
+      LOG_DIR: ${LOG_DIR:-/app/logs}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
