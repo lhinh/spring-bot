@@ -10,13 +10,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>3.1.4</spring.boot.version>
+        <spring.boot.version>3.2.1</spring.boot.version>
         <jpamodelgen.version>6.3.1.Final</jpamodelgen.version>
         <d4j.version>3.2.5</d4j.version>
         <lavaplayer.version>1.4.3</lavaplayer.version>
         <mariadb.version>3.2.0</mariadb.version>
-        <java.version>17</java.version>
-        <maven.compiler.release>17</maven.compiler.release>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
     <repositories>
@@ -133,10 +133,12 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <exclude>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                    </exclude>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                     <!-- <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

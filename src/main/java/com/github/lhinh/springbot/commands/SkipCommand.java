@@ -30,7 +30,7 @@ public class SkipCommand implements SlashCommand {
         AudioTrackScheduler scheduler = currentGAM.getScheduler();
 
         if (scheduler.skip()) {
-            String nextTrack = currentGAM.getPlayingTrackAsString();
+            String nextTrack = currentGAM.getPlayingTrackUri();
             StringBuilder sb = new StringBuilder("Next track playing: %s");
             String replyMessage = "";
             if (!currentGAM.isPlaylistEmpty()) {
