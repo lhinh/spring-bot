@@ -47,15 +47,11 @@ jobs:
     docker:
       - image: cimg/openjdk:21.0
     steps:
-      - checkout
-      - run:
-          name: Build JAR
-          command: mvn -B -DskipTests clean package
       - setup_remote_docker
       - run:
           name: Build and push Docker image
           command: |
             docker build -t spring-bot .
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker tag spring-bot "$DOCKERHUB_USERNAME"/spring-bot
             docker push "$DOCKERHUB_USERNAME"/spring-bot
