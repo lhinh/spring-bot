@@ -75,20 +75,15 @@ public class PlayCommand implements SlashCommand {
         Mono<Void> editReplyOnPlaylistCount = Mono.justOrEmpty(httpLinkUtil.isValidHttpLink(link))
             .flatMap(isValidHttpLink -> {
                     String replyMessage = "";
-                    if (isValidHttpLink) {
-                        if (currentGAM.isPlaylistEmpty()) {
-                            replyMessage = "Now Playing: " + link;
-                        } else {
-                            int trackPosition = currentGAM.getPlaylistSize();
-                            replyMessage = "#" + trackPosition + " in playlist\n" + link;
-                        }
+                    String linkToEmbed = link;
+                    if (!isValidHttpLink)
+                        linkToEmbed = currentGAM.getLastSearchedLink();
+
+                    if (currentGAM.isPlaylistEmpty()) {
+                        replyMessage = "Now Playing: " + linkToEmbed;
                     } else {
-                        if (!currentGAM.isPlaylistEmpty()) {
-                            currentGAM.clearPlaylist();
-                            replyMessage = "Now Playing: " + currentGAM.getPlayingTrackUri();
-                        } else {
-                            replyMessage = "Unable to search while track is playing. Request this feature?\n";
-                        }
+                        int trackPosition = currentGAM.getPlaylistSize();
+                        replyMessage = "#" + trackPosition + " in playlist\n" + linkToEmbed;
                     }
                     return event.editReply(replyMessage);
             }).then();

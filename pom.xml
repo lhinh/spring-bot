@@ -5,7 +5,7 @@
     
     <groupId>lhinh</groupId>
     <artifactId>spring-bot</artifactId>
-    <version>v0.1.0</version>
+    <version>v0.1.1</version>
     <name>spring-bot</name>
 
     <properties>
