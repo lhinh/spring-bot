@@ -11,7 +11,7 @@ workflows:
       - build-test
       - docker-push:
           requires:
-            - build-and-test
+            - build-test
           filters:
             branches:
               only:
