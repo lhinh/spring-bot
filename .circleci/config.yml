@@ -51,7 +51,7 @@ jobs:
       - run:
           name: Build and push Docker image
           command: |
-            docker build -t spring-bot .
+            docker build -t spring-bot ../
             echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker tag spring-bot "$DOCKERHUB_USERNAME"/spring-bot
             docker push "$DOCKERHUB_USERNAME"/spring-bot
