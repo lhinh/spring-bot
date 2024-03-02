@@ -80,8 +80,8 @@
         </dependency>
         <!-- Music Player -->
         <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
+            <groupId>com.github.devoxin</groupId>
+            <artifactId>lavaplayer</artifactId>
             <version>${lavaplayer.version}</version>
         </dependency>
 
