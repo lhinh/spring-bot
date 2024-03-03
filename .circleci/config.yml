@@ -13,7 +13,13 @@ workflows:
   build-test-docker-push: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build-test
+      - build-test:
+          filters:
+            branches:
+              only:
+                - main
+                - dev
+                - test-build-deploy
       - docker-push:
           requires:
             - build-test
@@ -21,7 +27,8 @@ workflows:
             branches:
               only:
                 - main
-                - dev
+                - test-build-deploy
+
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
@@ -46,8 +53,10 @@ jobs:
           name: Test
           command: mvn test
       - run:
-          name: Archive Docker image
-          command: docker save -o image.tar $IMAGE_NAME
+          name: Build and archive Docker image
+          command: |
+            docker build -t $IMAGE_NAME .
+            docker save -o image.tar $IMAGE_NAME
       - persist_to_workspace:
           root: .
           paths:
@@ -63,9 +72,8 @@ jobs:
           name: Load archived Docker image
           command: docker load -i /tmp/workspace/image.tar
       - run:
-          name: Build and push Docker image
+          name: Push Docker image
           command: |
-            docker build -t spring-bot -f Dockerfile .
             echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker tag spring-bot "$DOCKERHUB_USERNAME"/spring-bot
-            docker push "$DOCKERHUB_USERNAME"/spring-bot
+            docker tag $IMAGE_NAME "$DOCKERHUB_USERNAME"/"$IMAGE_NAME"
+            docker push "$DOCKERHUB_USERNAME"/"$IMAGE_NAME"
