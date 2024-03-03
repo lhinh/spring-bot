@@ -3,6 +3,8 @@
 version: 2.1
 executors:
   docker-publisher:
+    environment:
+        IMAGE_NAME: spring-bot
     docker:
         - image: cimg/openjdk:21.0
 # Orchestrate jobs using workflows
@@ -42,12 +44,23 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
 
   docker-push:
     executor: docker-publisher
     steps:
-      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
       - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
       - run:
           name: Build and push Docker image
           command: |
