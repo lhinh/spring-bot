@@ -6,7 +6,6 @@ executors:
   docker-publisher:
     environment:
         IMAGE_NAME: spring-bot
-        RELEASE: ${RELEASE}
     docker:
         - image: cimg/openjdk:21.0
 
