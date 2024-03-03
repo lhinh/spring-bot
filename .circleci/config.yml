@@ -46,6 +46,7 @@ jobs:
   docker-push:
     executor: docker-publisher
     steps:
+      - checkout
       - setup_remote_docker
       - run:
           name: Build and push Docker image
