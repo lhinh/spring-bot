@@ -5,7 +5,7 @@
     
     <groupId>lhinh</groupId>
     <artifactId>spring-bot</artifactId>
-    <version>v0.1.0</version>
+    <version>v0.1.1</version>
     <name>spring-bot</name>
 
     <properties>
@@ -80,8 +80,8 @@
         </dependency>
         <!-- Music Player -->
         <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
+            <groupId>com.github.devoxin</groupId>
+            <artifactId>lavaplayer</artifactId>
             <version>${lavaplayer.version}</version>
         </dependency>
 
@@ -156,6 +156,26 @@
                     <execution>
                         <goals>
                             <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.9</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>

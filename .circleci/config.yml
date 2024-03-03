@@ -2,37 +2,99 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
-jobs:
-  # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
-  build-and-test:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
+executors:
+  docker-publisher:
+    environment:
+        IMAGE_NAME: spring-bot
+        RELEASE: ${RELEASE}
     docker:
-      # Specify the version you desire here
-      # See: https://circleci.com/developer/images/image/cimg/openjdk
-      - image: cimg/openjdk:21.0
+        - image: cimg/openjdk:21.0
 
-    # Add steps to the job
-    # See: https://circleci.com/docs/jobs-steps/#steps-overview & https://circleci.com/docs/configuration-reference/#steps
+workflows:
+  build-test-docker-push:
+    jobs:
+      - build-test:
+          filters:
+            branches:
+              only:
+                - main
+                - dev
+      - publish-latest:
+          requires:
+            - build-test
+          filters:
+            branches:
+              only:
+                - main
+  build-tags:
+    jobs:
+      - build-test:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - publish-tag:
+          requires:
+            - build-test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+
+jobs:
+  build-test:
+    executor: docker-publisher
     steps:
-      # Checkout the code as the first step.
       - checkout
-
-      # Use mvn clean and package as the standard maven build phase
+      - setup_remote_docker
       - run:
-          name: Build
+          name: Build JAR
           command: mvn -B -DskipTests clean package
-      # Then run your tests!
       - run:
           name: Test
           command: mvn test
-
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
-workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
-    jobs:
-      - build-and-test
+      - run:
+          name: Build and archive Docker image
+          command: |
+            docker build -t $IMAGE_NAME .
+            docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish-latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            IMAGE_TAG=${RELEASE%?}${CIRCLE_BUILD_NUM}
+            docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+            docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+            docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+  publish-tag:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            IMAGE_TAG=${CIRCLE_TAG/v/''}
+            docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+            docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+            docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
