@@ -36,6 +36,7 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
+      - setup_remote_docker
       # Use mvn clean and package as the standard maven build phase
       - run:
           name: Build JAR
