@@ -78,6 +78,7 @@ jobs:
             echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             IMAGE_TAG=${RELEASE%?}
             IMAGE_TAG=${IMAGE_TAG}${CIRCLE_BUILD_NUM}
+            docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
             docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
@@ -95,6 +96,7 @@ jobs:
           command: |
             echo "$DOCKERHUB_PAT" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             IMAGE_TAG=${CIRCLE_TAG/v/''}
+            docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
             docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
