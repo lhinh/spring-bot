@@ -35,7 +35,7 @@ public class DiscordConfig {
                 Retry.anyOf(NativeIoException.class)))
             .setReactorResources(ReactorResources.builder()
                 .httpClient(ReactorResources.newHttpClient(ConnectionProvider.builder("custom")
-                    .maxIdleTime(Duration.ofMinutes(10))
+                    .maxIdleTime(Duration.ofMinutes(5))
                     .build()))
                 .build())
             .build()
