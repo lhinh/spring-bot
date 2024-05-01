@@ -30,28 +30,30 @@ public class DiscordConfig {
     @Bean
     public <T extends Event> GatewayDiscordClient gatewayDiscordClient(List<EventListener<T>> eventListener) {
         GatewayDiscordClient discordClient = DiscordClientBuilder.create(discordConfigProperties.getBotToken())
-            .onClientResponse(ResponseFunction.retryWhen(
-                RouteMatcher.any(),
-                Retry.anyOf(NativeIoException.class)))
-            .setReactorResources(ReactorResources.builder()
-                .httpClient(ReactorResources.newHttpClient(ConnectionProvider.builder("custom")
-                    .maxIdleTime(Duration.ofMinutes(5))
-                    .build()))
-                .build())
-            .build()
-            .gateway()
-            .withEventDispatcher(dispatcher -> {
-                return Flux.fromIterable(eventListener)
-                    .flatMap(listener -> {
-                        return dispatcher.on(listener.getEventType()).flatMap(listener::handle).onErrorResume(listener::handleError);
-                    });
-            })
-            .login()
-            .block();
+                .onClientResponse(ResponseFunction.retryWhen(
+                        RouteMatcher.any(),
+                        Retry.anyOf(NativeIoException.class)))
+                .setReactorResources(ReactorResources.builder()
+                        .httpClient(ReactorResources.newHttpClient(ConnectionProvider.builder("custom")
+                                .maxIdleTime(Duration.ofMinutes(5))
+                                .build()))
+                        .build())
+                .build()
+                .gateway()
+                .withEventDispatcher(dispatcher -> {
+                    return Flux.fromIterable(eventListener)
+                            .flatMap(listener -> {
+                                return dispatcher.on(listener.getEventType())
+                                        .flatMap(event -> listener.handle(event)
+                                                .onErrorResume(listener::handleError));
+                            });
+                })
+                .login()
+                .block();
 
-        return discordClient;   
+        return discordClient;
     }
-    
+
     @Bean
     public RestClient discordRestClient(GatewayDiscordClient client) {
         return client.getRestClient();
