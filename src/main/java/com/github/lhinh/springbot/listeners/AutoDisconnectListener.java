@@ -16,7 +16,9 @@ public class AutoDisconnectListener implements EventListener<VoiceStateUpdateEve
 
     private final GuildAudioManager guildAudioManager;
 
-    public AutoDisconnectListener(final GuildAudioManager guildAudioManager) { this.guildAudioManager = guildAudioManager; }
+    public AutoDisconnectListener(final GuildAudioManager guildAudioManager) {
+        this.guildAudioManager = guildAudioManager;
+    }
 
     @Override
     public Class<VoiceStateUpdateEvent> getEventType() {
@@ -33,30 +35,21 @@ public class AutoDisconnectListener implements EventListener<VoiceStateUpdateEve
             voiceChannelId = event.getCurrent().getChannelId().orElseThrow();
         } else {
             voiceChannelId = event.getOld().orElseThrow()
-                .getChannelId().orElseThrow();
+                    .getChannelId().orElseThrow();
         }
 
-        Publisher<Boolean> voiceStateCounter = event.getClient().getChannelById(voiceChannelId)
-            .cast(VoiceChannel.class)
-            .map(VoiceChannel::getVoiceStates)
-            .flatMap(voiceStates -> voiceStates.count())
-            .map(count -> 1L == count);
-
-        Mono<Snowflake> botVoiceChannelId = event.getClient().getVoiceConnectionRegistry().getVoiceConnection(currentGuildId)
-            .flatMap(VoiceConnection::getChannelId);
-
-        Mono<Void> onEvent = botVoiceChannelId
-            .filter(voiceChannelId::equals)
-            .filterWhen(ignore -> voiceStateCounter)
-            .switchIfEmpty(Mono.never())
-            .then();
-
-        Mono<Void> disconnect = event.getClient().getVoiceConnectionRegistry().getVoiceConnection(currentGuildId)
-            .flatMap(voiceChannel -> {
-                currentGAM.cleanUp();
-                return voiceChannel.disconnect();
-            });
-
-        return onEvent.then(disconnect);
+        return event.getClient().getVoiceConnectionRegistry().getVoiceConnection(currentGuildId)
+                .flatMap(voiceConnection -> voiceConnection.getChannelId())
+                .filter(voiceChannelId::equals)
+                .flatMapMany(ignored -> event.getClient().getChannelById(voiceChannelId)
+                        .cast(VoiceChannel.class)
+                        .flatMapMany(VoiceChannel::getVoiceStates))
+                .count()
+                .filter(count -> count == 1)
+                .flatMap(ignored -> {
+                    currentGAM.cleanUp();
+                    return event.getClient().getVoiceConnectionRegistry().getVoiceConnection(currentGuildId)
+                            .flatMap(voiceConnection -> voiceConnection.disconnect());
+                });
     }
 }
