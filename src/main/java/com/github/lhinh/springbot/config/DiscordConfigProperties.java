@@ -11,4 +11,5 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "discord")
 public class DiscordConfigProperties {
     private String botToken;
+    private String pinChannelName;
 }
