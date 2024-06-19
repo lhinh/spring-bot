@@ -1,14 +1,13 @@
 package com.github.lhinh.springbot.listeners;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import com.github.lhinh.springbot.config.DiscordConfigProperties;
 
-import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Guild;
@@ -17,14 +16,16 @@ import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.MessageCreateSpec;
 import discord4j.core.spec.TextChannelCreateSpec;
+import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
 @Component
 public class PinMessageListener implements EventListener<ReactionAddEvent>{
 
     private final DiscordConfigProperties discordConfigProperties;
+    // For posterity
+    private final Color nutMeat = Color.of(222, 197, 183);
 
     public PinMessageListener(DiscordConfigProperties discordConfigProperties) {
         this.discordConfigProperties = discordConfigProperties;
@@ -55,10 +56,11 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
             event.getChannelId().asString(),
             message.getId().asString());
         String messageHyperlink = String.format("[%s](%s)", "Jump!", messageUrl);
-    
         EmbedCreateSpec.Builder pinContentEmbed = EmbedCreateSpec.builder()
             .author(message.getAuthor().orElseThrow().getUsername(), null, message.getAuthor().orElseThrow().getAvatarUrl())
             .description(message.getContent())
+            .color(Color.TAHITI_GOLD)
+            .timestamp(Instant.now())
             .addField("**Source**", messageHyperlink, false);
     
         List<String> imageUrls = extractUrls(message.getAttachments(), true);
