@@ -44,6 +44,7 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
         final String channelName = discordConfigProperties.getPinChannelName();
 
         return event.getMessage()
+            .filterWhen(message -> checkIfAlreadyPinned(message, event, channelName).map(isPinned -> !isPinned))
             .flatMap(message -> createPinContentEmbed(message, event))
             .flatMap(embed -> sendMessageToChannel(embed, event, channelName))
             .then();
@@ -60,6 +61,7 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
             .author(message.getAuthor().orElseThrow().getUsername(), null, message.getAuthor().orElseThrow().getAvatarUrl())
             .description(message.getContent())
             .color(Color.TAHITI_GOLD)
+            .footer(message.getId().asString(), null)
             .timestamp(Instant.now())
             .addField("**Source**", messageHyperlink, false);
     
@@ -99,5 +101,14 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
             .flatMap(guild -> guild.createTextChannel(TextChannelCreateSpec.builder().name(channelName).build()))
             .cast(TextChannel.class);
     }
-    
+
+    private Mono<Boolean> checkIfAlreadyPinned(Message message, ReactionAddEvent event, String channelName) {
+        return event.getClient().getGuildById(event.getGuildId().orElseThrow())
+            .flatMapMany(Guild::getChannels)
+            .filter(channel -> channel.getName().equals(channelName) && channel.getType() == Channel.Type.GUILD_TEXT)
+            .cast(TextChannel.class)
+            .flatMap(channel -> channel.getMessagesBefore(message.getId()))
+            .flatMapIterable(msg -> msg.getEmbeds())
+            .any(embed -> embed.getFooter().map(footer -> footer.getText().equals(message.getId().asString())).orElse(false));
+    }
 }
