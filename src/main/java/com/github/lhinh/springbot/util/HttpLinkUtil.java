@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HttpLinkUtil {
-    private final String HTTP_LINK_REGEX = "^(http:\\/\\/|https:\\/\\/\\b)?(www.\\b)?([a-zA-Z0-9]*\\b)+.([a-zA-Z]{2,3}\\b)(\\/\\S*\\b)?$";
+    private static final String HTTP_LINK_REGEX = "^(http:\\/\\/|https:\\/\\/\\b)?(www.\\b)?([a-zA-Z0-9]*\\b)+.([a-zA-Z]{2,3}\\b)(\\/\\S*\\b)?$";
+    private static final String IMAGE_EXT_REGEX = ".*\\.(jpg|jpeg|gif|png|bmp|tiff|webp)$";
 
     private final Pattern pattern;
     private Matcher matcher;
@@ -15,8 +16,13 @@ public class HttpLinkUtil {
     public HttpLinkUtil() {
         this.pattern = Pattern.compile(HTTP_LINK_REGEX);
     }
-    public boolean isValidHttpLink(String link) {
+
+    public static boolean isValidHttpLink(String link) {
         return Pattern.matches(HTTP_LINK_REGEX, link);
+    }
+
+    public static boolean isImage(String link) {
+        return Pattern.matches(IMAGE_EXT_REGEX, link);
     }
 
     public String getDomain(String link) {
