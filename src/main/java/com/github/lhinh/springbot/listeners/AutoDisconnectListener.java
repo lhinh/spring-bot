@@ -1,6 +1,5 @@
 package com.github.lhinh.springbot.listeners;
 
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Component;
 
 import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
@@ -8,7 +7,6 @@ import com.github.lhinh.springbot.musicplayer.GuildAudioManager;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 
 @Component
