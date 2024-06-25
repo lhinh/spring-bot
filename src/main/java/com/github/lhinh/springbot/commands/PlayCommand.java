@@ -6,7 +6,6 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.Member;
-import discord4j.voice.VoiceConnection;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -20,11 +19,9 @@ import reactor.core.publisher.Mono;
 public class PlayCommand implements SlashCommand {
 
     private final GuildAudioManager guildAudioManager;
-    private final HttpLinkUtil httpLinkUtil;
 
     public PlayCommand(@NonNull final GuildAudioManager guildAudioManager) {
         this.guildAudioManager = guildAudioManager;
-        this.httpLinkUtil = new HttpLinkUtil();
     }
 
     @Override
@@ -58,7 +55,7 @@ public class PlayCommand implements SlashCommand {
                             GuildAudioManager currentGAM = guildAudioManager.of(guildId);
 
                             currentGAM.loadItem(link);
-                            boolean isValidHttpLink = httpLinkUtil.isValidHttpLink(link);
+                            boolean isValidHttpLink = HttpLinkUtil.isValidHttpLink(link);
 
                             String replyMessage = "";
                             String linkToEmbed = link;
@@ -77,7 +74,7 @@ public class PlayCommand implements SlashCommand {
     }
 
     private String getLinkOrSearchQuery(String inputOption, String searchTag) {
-        if (httpLinkUtil.isValidHttpLink(inputOption)) {
+        if (HttpLinkUtil.isValidHttpLink(inputOption)) {
             return inputOption;
         } else {
             return searchTag + inputOption;

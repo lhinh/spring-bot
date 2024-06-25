@@ -21,12 +21,15 @@ import discord4j.core.spec.TextChannelCreateSpec;
 import discord4j.rest.util.Color;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 
 @RequiredArgsConstructor
 @Component
 public class PinMessageListener implements EventListener<ReactionAddEvent>{
 
     private final DiscordConfigProperties discordConfigProperties;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
     // For posterity
     // private final Color nutMeat = Color.of(222, 197, 183);
 
@@ -55,13 +58,18 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
             event.getGuildId().orElseThrow().asString(),
             event.getChannelId().asString(),
             message.getId().asString());
+        String messageDate = message.getTimestamp()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(DATE_FORMATTER);
         String messageHyperlink = String.format("[%s](%s)", "Jump!", messageUrl);
         EmbedCreateSpec.Builder pinContentEmbed = EmbedCreateSpec.builder()
             .author(message.getAuthor().orElseThrow().getUsername(), null, message.getAuthor().orElseThrow().getAvatarUrl())
             .color(Color.TAHITI_GOLD)
             .footer(message.getId().asString(), null)
             .timestamp(Instant.now())
-            .addField("**Source**", messageHyperlink, false);
+            .addField("**Source**", messageHyperlink, true)
+            .addField("**Date Posted**", messageDate, true);
     
         if (HttpLinkUtil.isImage(message.getContent())) {
 
