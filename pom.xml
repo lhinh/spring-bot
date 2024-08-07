@@ -14,7 +14,7 @@
         <!-- <jpamodelgen.version>6.3.1.Final</jpamodelgen.version> -->
         <d4j.version>3.2.5</d4j.version>
         <lavalink.lavaplayer.version>1.9.1</lavalink.lavaplayer.version>
-        <lavalink.youtube.version>1.5.1</lavalink.youtube.version>
+        <lavalink.youtube.version>1.5.2</lavalink.youtube.version>
         <!-- <mariadb.version>3.2.0</mariadb.version> -->
         <reactor.version>3.5.10</reactor.version>
         <java.version>21</java.version>
