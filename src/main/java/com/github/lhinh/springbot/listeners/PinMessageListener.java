@@ -29,7 +29,8 @@ import java.time.ZoneId;
 public class PinMessageListener implements EventListener<ReactionAddEvent>{
 
     private final DiscordConfigProperties discordConfigProperties;
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm zzz");
+    private static final String PACIFIC_ZONE = "America/Los_Angeles";
     // For posterity
     // private final Color nutMeat = Color.of(222, 197, 183);
 
@@ -58,13 +59,19 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
             event.getGuildId().orElseThrow().asString(),
             event.getChannelId().asString(),
             message.getId().asString());
+
         String messageDate = message.getTimestamp()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime()
+                .atZone(ZoneId.of(PACIFIC_ZONE))
+                // .toLocalDateTime()
                 .format(DATE_FORMATTER);
+
         String messageHyperlink = String.format("[%s](%s)", "Jump!", messageUrl);
+
         EmbedCreateSpec.Builder pinContentEmbed = EmbedCreateSpec.builder()
-            .author(message.getAuthor().orElseThrow().getUsername(), null, message.getAuthor().orElseThrow().getAvatarUrl())
+            .author(
+                message.getAuthor().orElseThrow().getUsername(),
+                null,
+                message.getAuthor().orElseThrow().getAvatarUrl())
             .color(Color.TAHITI_GOLD)
             .footer(message.getId().asString(), null)
             .timestamp(Instant.now())
@@ -72,7 +79,6 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
             .addField("**Date Posted**", messageDate, true);
     
         if (HttpLinkUtil.isImage(message.getContent())) {
-
             pinContentEmbed.image(message.getContent());
         } else {
             pinContentEmbed.description(message.getContent());
