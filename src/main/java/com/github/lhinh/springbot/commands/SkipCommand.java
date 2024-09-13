@@ -35,10 +35,13 @@ public class SkipCommand implements SlashCommand {
             String replyMessage = "";
             if (!currentGAM.isPlaylistEmpty()) {
                 int playlistSize = currentGAM.getPlaylistSize();
-                sb.insert(0, "%d tracks in playlist\n");
+                if (playlistSize == 1)
+                    sb.insert(0, "%d track in playlist.\n");
+                else
+                    sb.insert(0, "%d tracks in playlist.\n");
                 replyMessage = String.format(sb.toString(), playlistSize, nextTrack);
             } else {
-                sb.insert(0, "None left in playlist\n");
+                sb.insert(0, "None left in playlist.\n");
                 replyMessage = String.format(sb.toString(), nextTrack);
             }
             
