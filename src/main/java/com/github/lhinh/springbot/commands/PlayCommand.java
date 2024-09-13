@@ -41,6 +41,7 @@ public class PlayCommand implements SlashCommand {
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
         Snowflake guildId = event.getInteraction().getGuildId().orElseThrow();
+        Snowflake channelId = event.getInteraction().getChannelId();
         return event.deferReply()
                 .then(joinMemberChannel(event))
                 .then(Mono.fromCallable(() -> {
@@ -53,7 +54,7 @@ public class PlayCommand implements SlashCommand {
                 })
                         .flatMap(link -> {
                             GuildAudioManager currentGAM = guildAudioManager.of(guildId);
-
+                            currentGAM.setGuildAndChannelId(guildId, channelId);
                             currentGAM.loadItem(link);
                             boolean isValidHttpLink = HttpLinkUtil.isValidHttpLink(link);
 
@@ -66,7 +67,7 @@ public class PlayCommand implements SlashCommand {
                                 replyMessage = "Now Playing: " + linkToEmbed;
                             } else {
                                 int trackPosition = currentGAM.getPlaylistSize();
-                                replyMessage = "#" + trackPosition + " in playlist\n" + linkToEmbed;
+                                replyMessage = "#" + trackPosition + " in playlist.\n" + linkToEmbed;
                             }
 
                             return event.editReply(replyMessage);
