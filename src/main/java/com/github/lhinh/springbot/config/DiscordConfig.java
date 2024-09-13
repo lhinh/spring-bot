@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.github.lhinh.springbot.listeners.EventListener;
+import com.github.lhinh.springbot.listener.EventListener;
 
 import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClientBuilder;
