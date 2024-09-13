@@ -1,6 +1,7 @@
-package com.github.lhinh.springbot.util;
+package com.github.lhinh.springbot.service;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import discord4j.common.util.Snowflake;
@@ -8,17 +9,17 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
-import io.micrometer.common.lang.NonNull;
+
 import reactor.core.publisher.Mono;
 
 
 @Component
-public class MessageUtil {
+public class MessageSenderService {
 
     private final GatewayDiscordClient gatewayDiscordClient;
     private final String ALL_DONE_MSG = "Nothing left to play :(";
 
-    public MessageUtil(@Lazy @NonNull final GatewayDiscordClient gatewayDiscordClient) {
+    public MessageSenderService(@Lazy @NonNull final GatewayDiscordClient gatewayDiscordClient) {
         this.gatewayDiscordClient = gatewayDiscordClient;
     }
 
