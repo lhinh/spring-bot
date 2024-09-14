@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.github.lhinh.springbot.util.MessageUtil;
+import com.github.lhinh.springbot.service.MessageSenderService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -18,17 +18,17 @@ public class AudioTrackScheduler extends AudioEventAdapter {
   private final List<AudioTrack> queue;
   private final AudioPlayer player;
   private boolean isCurrentlyPlaying;
-  private final MessageUtil messageUtil;
+  private final MessageSenderService messageSenderService;
   private Snowflake guildId;
   private Snowflake channelId;
 
-  public AudioTrackScheduler(AudioPlayer player, MessageUtil messageUtil) {
+  public AudioTrackScheduler(AudioPlayer player, MessageSenderService messageSenderService) {
     // The queue may be modifed by different threads so guarantee memory safety
     // This does not, however, remove several race conditions currently present
     queue = Collections.synchronizedList(new LinkedList<>());
     this.player = player;
     isCurrentlyPlaying = false;
-    this.messageUtil = messageUtil;
+    this.messageSenderService = messageSenderService;
   }
 
   public List<AudioTrack> getQueue() {
@@ -85,11 +85,11 @@ public class AudioTrackScheduler extends AudioEventAdapter {
         AudioTrack nextTrack = player.getPlayingTrack();
         if (nextTrack != null) {
           int trackPosition = queue.size();
-          messageUtil.sendCurrentlyPlayingTrack(guildId, channelId, trackPosition, nextTrack.getInfo().uri)
+          messageSenderService.sendCurrentlyPlayingTrack(guildId, channelId, trackPosition, nextTrack.getInfo().uri)
               .subscribe();
         }
       } else {
-        messageUtil.sendAllDone(guildId, channelId).subscribe();
+        messageSenderService.sendAllDone(guildId, channelId).subscribe();
       }
     }
   }

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.github.lhinh.springbot.util.MessageUtil;
+import com.github.lhinh.springbot.service.MessageSenderService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
@@ -33,18 +33,18 @@ public class GuildAudioManager{
     private final AudioPlayerManager audioPlayerManager;
     private final Map<Snowflake, GuildAudioManager> guildAudioManagers = new ConcurrentHashMap<>();
     private String lastSearchedLink = "";
-    private final MessageUtil messageUtil;
+    private final MessageSenderService messageSenderService;
 
     public GuildAudioManager of(Snowflake guildId) {
-        return guildAudioManagers.computeIfAbsent(guildId, ignored -> new GuildAudioManager(audioPlayerManager, messageUtil));
+        return guildAudioManagers.computeIfAbsent(guildId, ignored -> new GuildAudioManager(audioPlayerManager, messageSenderService));
     }
 
-    private GuildAudioManager(AudioPlayerManager audioPlayerManager, MessageUtil messageUtil) {
+    private GuildAudioManager(AudioPlayerManager audioPlayerManager, MessageSenderService messageSenderService) {
         this.audioPlayerManager = audioPlayerManager;
         player = audioPlayerManager.createPlayer();
-        scheduler = new AudioTrackScheduler(player, messageUtil);
+        scheduler = new AudioTrackScheduler(player, messageSenderService);
         provider = new LavaPlayerAudioProvider(player);
-        this.messageUtil = messageUtil;
+        this.messageSenderService = messageSenderService;
 
         player.addListener(scheduler);
     }

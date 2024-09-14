@@ -1,4 +1,4 @@
-package com.github.lhinh.springbot.listeners;
+package com.github.lhinh.springbot.listener;
 
 import java.time.Instant;
 import java.util.List;

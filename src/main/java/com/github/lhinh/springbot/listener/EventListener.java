@@ -1,4 +1,4 @@
-package com.github.lhinh.springbot.listeners;
+package com.github.lhinh.springbot.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

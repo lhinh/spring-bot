@@ -1,4 +1,4 @@
-package com.github.lhinh.springbot.listeners;
+package com.github.lhinh.springbot.listener;
 
 import com.github.lhinh.springbot.commands.SlashCommand;
 
