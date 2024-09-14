@@ -2,7 +2,7 @@ package com.github.lhinh.springbot.musicplayer;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.github.lhinh.springbot.util.MessageUtil;
+import com.github.lhinh.springbot.service.MessageSenderService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
@@ -14,8 +14,8 @@ public class AudioTrackSchedulerTest {
     void testAudioTrackSchedulerPlay_EmptyPlaylist() {
         boolean force = true;
         AudioPlayer player = Mockito.mock(AudioPlayer.class);
-        MessageUtil messageUtil = Mockito.mock(MessageUtil.class);
-        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageUtil);
+        MessageSenderService messageSenderService = Mockito.mock(MessageSenderService.class);
+        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageSenderService);
         
         AudioTrack track = Mockito.mock(AudioTrack.class);
         Mockito.when(player.startTrack(track, force)).thenReturn(true);
@@ -30,8 +30,8 @@ public class AudioTrackSchedulerTest {
     void testAudioTrackSchedulerPlay_AddOneToPlaylist() {
         boolean force = true;
         AudioPlayer player = Mockito.mock(AudioPlayer.class);
-        MessageUtil messageUtil = Mockito.mock(MessageUtil.class);
-        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageUtil);
+        MessageSenderService messageSenderService = Mockito.mock(MessageSenderService.class);
+        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageSenderService);
         
             
         AudioTrack track1 = Mockito.mock(AudioTrack.class);
@@ -69,8 +69,8 @@ public class AudioTrackSchedulerTest {
     void testAudioTrackSchedulerSkip_SkipToStop() {
         boolean force = true;
         AudioPlayer player = Mockito.mock(AudioPlayer.class);
-        MessageUtil messageUtil = Mockito.mock(MessageUtil.class);
-        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageUtil);
+        MessageSenderService messageSenderService = Mockito.mock(MessageSenderService.class);
+        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageSenderService);
         
             
         AudioTrack track1 = Mockito.mock(AudioTrack.class);
@@ -103,8 +103,8 @@ public class AudioTrackSchedulerTest {
     void testAudioTrackSchedulerStop() {
         boolean force = true;
         AudioPlayer player = Mockito.mock(AudioPlayer.class);
-        MessageUtil messageUtil = Mockito.mock(MessageUtil.class);
-        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageUtil);
+        MessageSenderService messageSenderService = Mockito.mock(MessageSenderService.class);
+        AudioTrackScheduler scheduler = new AudioTrackScheduler(player, messageSenderService);
         
         AudioTrack track = Mockito.mock(AudioTrack.class);
         Mockito.when(player.startTrack(track, force)).thenReturn(true);
