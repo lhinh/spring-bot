@@ -34,7 +34,10 @@ public class GlobalAudioPlayerManager {
         audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
         audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
         audioPlayerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
-        
+        audioPlayerManager.getSourceManagers().stream()
+            .filter(sourceManager -> sourceManager instanceof YoutubeAudioSourceManager)
+            .findFirst()
+            .ifPresent(sourceManager -> ((YoutubeAudioSourceManager) sourceManager).useOauth2(null, false));
         return audioPlayerManager;
     }
     
