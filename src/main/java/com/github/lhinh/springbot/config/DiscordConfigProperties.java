@@ -12,4 +12,6 @@ import lombok.Setter;
 public class DiscordConfigProperties {
     private String botToken;
     private String pinChannelName;
+    private String visitorData;
+    private String poToken;
 }
