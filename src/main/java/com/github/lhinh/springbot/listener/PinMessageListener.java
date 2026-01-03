@@ -14,7 +14,6 @@ import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.TextChannelCreateSpec;
@@ -41,7 +40,7 @@ public class PinMessageListener implements EventListener<ReactionAddEvent>{
 
     @Override
     public Mono<Void> handle(ReactionAddEvent event) {
-        if (!ReactionEmoji.unicode("📌").equals(event.getEmoji()))
+        if (!event.getEmoji().asFormat().equals("📌"))
             return Mono.empty();
 
         final String channelName = discordConfigProperties.getPinChannelName();

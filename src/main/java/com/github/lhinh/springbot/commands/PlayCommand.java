@@ -34,7 +34,9 @@ public class PlayCommand implements SlashCommand {
                 .flatMap(Member::getVoiceState)
                 .flatMap(VoiceState::getChannel)
                 .flatMap(channel -> {
-                    return channel.join().withProvider(guildAudioManager.of(channel.getGuildId()).getProvider());
+                    return channel.join()
+                        .withSelfDeaf(true)
+                        .withProvider(guildAudioManager.of(channel.getGuildId()).getProvider());
                 }).then();
     }
 
