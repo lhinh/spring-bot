@@ -19,7 +19,8 @@ import io.netty.channel.unix.Errors.NativeIoException;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.netty.resources.ConnectionProvider;
-import reactor.retry.Retry;
+import reactor.util.retry.Retry;
+import reactor.util.retry.RetryBackoffSpec;
 
 @RequiredArgsConstructor
 @Configuration
@@ -29,10 +30,13 @@ public class DiscordConfig {
 
     @Bean
     public <T extends Event> GatewayDiscordClient gatewayDiscordClient(List<EventListener<T>> eventListener) {
+        RetryBackoffSpec retrySpec = Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
+                .filter(throwable -> throwable instanceof NativeIoException);
+        
         GatewayDiscordClient discordClient = DiscordClientBuilder.create(discordConfigProperties.getBotToken())
                 .onClientResponse(ResponseFunction.retryWhen(
                         RouteMatcher.any(),
-                        Retry.anyOf(NativeIoException.class)))
+                        retrySpec))
                 .setReactorResources(ReactorResources.builder()
                         .httpClient(ReactorResources.newHttpClient(ConnectionProvider.builder("custom")
                                 .maxIdleTime(Duration.ofMinutes(5))

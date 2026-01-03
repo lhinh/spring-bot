@@ -26,7 +26,9 @@ public class JoinCommand implements SlashCommand {
         Mono.justOrEmpty(event.getInteraction().getMember())
             .flatMap(Member::getVoiceState)
             .flatMap(VoiceState::getChannel)
-            .flatMap(channel -> channel.join().withProvider(guildAudioManager.of(channel.getGuildId()).getProvider()))
+            .flatMap(channel -> channel.join()
+                .withSelfDeaf(true)
+                .withProvider(guildAudioManager.of(channel.getGuildId()).getProvider()))
             .subscribe();
 
         return event.reply("Joining voice channel.")

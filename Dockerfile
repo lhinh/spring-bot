@@ -1,5 +1,5 @@
-# Use the official OpenJDK image
-FROM openjdk:21-jdk
+# Use Eclipse Temurin (successor to AdoptOpenJDK)
+FROM eclipse-temurin:21-jdk
 
 # Set the working directory in the container
 WORKDIR /app
