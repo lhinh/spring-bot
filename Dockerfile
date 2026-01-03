@@ -1,9 +1,5 @@
 # Use Eclipse Temurin JRE (smaller image for runtime)
-FROM eclipse-temurin:21-jre
-
-# Ensure Java is in PATH (explicitly set JAVA_HOME)
-ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
+FROM eclipse-temurin:21-jre-jammy
 
 # Set the working directory in the container
 WORKDIR /app
@@ -17,5 +13,6 @@ COPY target/spring-bot-v0.1.1.jar /app
 # Create logs directory
 RUN mkdir -p /app/logs
 
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "spring-bot-v0.1.1.jar"]
+# Use the full path to java (eclipse-temurin typically installs at /opt/java/openjdk)
+# This ensures java is found regardless of PATH configuration
+ENTRYPOINT ["/opt/java/openjdk/bin/java", "-jar", "spring-bot-v0.1.1.jar"]
