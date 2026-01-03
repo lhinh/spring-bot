@@ -13,6 +13,9 @@ COPY target/spring-bot-v0.1.1.jar /app
 # Create logs directory
 RUN mkdir -p /app/logs
 
+# Declare volume for logs (mounted in docker-compose.yml)
+VOLUME /app/logs
+
 # Use the full path to java (eclipse-temurin typically installs at /opt/java/openjdk)
 # This ensures java is found regardless of PATH configuration
 ENTRYPOINT ["/opt/java/openjdk/bin/java", "-jar", "spring-bot-v0.1.1.jar"]
